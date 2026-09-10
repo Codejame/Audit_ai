@@ -78,8 +78,8 @@ SentinelAI provides an intelligent, automated pipeline that accepts financial do
 ### Installation Steps
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/document-intelligence-platform.git
-cd document-intelligence-platform
+git clone https://github.com/Codejame/Audit_ai.git
+cd Audit_ai
 
 # 2. Create and activate a virtual environment
 python -m venv venv
@@ -145,7 +145,7 @@ FINANCIAL_TOLERANCE=1.00
 * **Live Backend Base API**: `https://document-intelligence-platform.onrender.com/api/v1`
 * **Swagger / OpenAPI Documentation**: `https://document-intelligence-platform.onrender.com/docs`
 * **Health Check Endpoint**: `https://document-intelligence-platform.onrender.com/api/v1/health`
-* **Public GitHub Repository**: `https://github.com/your-username/document-intelligence-platform` *(Replace with your GitHub repo URL)*
+* **Public GitHub Repository**: [https://github.com/Codejame/Audit_ai](https://github.com/Codejame/Audit_ai)
 
 ---
 
