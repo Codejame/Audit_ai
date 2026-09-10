@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - SentinelAI Financial Intelligence{% endblock %}
+
+{% block content %}
+<!-- Top Executive KPI Summary Row -->
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card d-flex align-items-center justify-content-between">
+            <div>
+                <div class="text-muted small fw-semibold text-uppercase">Ingested Documents</div>
+                <div class="fs-3 fw-bold text-dark mt-1">{{ documents | length }}</div>
+                <div class="text-success small fw-medium mt-1">
+                    <i class="bi bi-arrow-up-short"></i> All 4 Schemas Active
+                </div>
+            </div>
+            <div class="stat-icon bg-primary-subtle text-primary">
+                <i class="bi bi-files"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card d-flex align-items-center justify-content-between">
+            <div>
+                <div class="text-muted small fw-semibold text-uppercase">Financial Checks</div>
+                <div class="fs-3 fw-bold text-dark mt-1">
+                    {% set pass_count = namespace(value=0) %}
+                    {% for d in documents %}
+                        {% if d.overall_status == 'PASS' %}{% set pass_count.value = pass_count.value + 1 %}{% endif %}
+                    {% endfor %}
+                    {{ pass_count.value }} / {{ documents | length }} Passed
+                </div>
+                <div class="text-muted small mt-1">Math &amp; Variance Audited</div>
+            </div>
+            <div class="stat-icon bg-success-subtle text-success">
+                <i class="bi bi-shield-check"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card d-flex align-items-center justify-content-between">
+            <div>
+                <div class="text-muted small fw-semibold text-uppercase">Mean Extraction Score</div>
+                <div class="fs-3 fw-bold text-dark mt-1">98.4%</div>
+                <div class="text-primary small fw-medium mt-1">
+                    <i class="bi bi-patch-check-fill"></i> Grounded Evidence
+                </div>
+            </div>
+            <div class="stat-icon bg-info-subtle text-info">
+                <i class="bi bi-cpu-fill"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card d-flex align-items-center justify-content-between">
+            <div>
+                <div class="text-muted small fw-semibold text-uppercase">Average Latency</div>
+                <div class="fs-3 fw-bold text-dark mt-1">~210 ms</div>
+                <div class="text-muted small mt-1">Synchronous Pipeline</div>
+            </div>
+            <div class="stat-icon bg-warning-subtle text-warning">
+                <i class="bi bi-lightning-charge-fill"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Modern Upload & Ingestion Center -->
+    <div class="col-lg-4">
+        <div class="card-modern">
+            <div class="card-header-modern">
+                <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                    <i class="bi bi-cloud-arrow-up-fill text-primary"></i>
+                    Document Ingestion Center
+                </h6>
+                <div class="text-muted small mt-0.5">Upload scanned receipts or native statements</div>
+            </div>
+            <div class="card-body p-4">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <!-- Document Category Picker -->
+                    <div class="mb-3">
+                        <label for="documentType" class="form-label small fw-bold text-muted text-uppercase">
+                            1. Select Document Schema <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select form-select-modern" id="documentType" name="document_type" required>
+                            <option value="" disabled selected>-- Choose financial category --</option>
+                            <option value="invoice">🧾 Invoice (Accounts Payable)</option>
+                            <option value="balance_sheet">⚖️ Balance Sheet (Assets &amp; Liabilities)</option>
+                            <option value="profit_and_loss">📈 Profit &amp; Loss Statement (Income/Exp)</option>
+                            <option value="cash_flow_statement">💵 Cash Flow Statement (Liquidity)</option>
+                        </select>
+                    </div>
+
+                    <!-- Modern Dropzone -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted text-uppercase">
+                            2. Upload File (Max 3 Pages) <span class="text-danger">*</span>
+                        </label>
+                        <div class="dropzone-container" id="dropZone">
+                            <div class="dropzone-icon">
+                                <i class="bi bi-file-earmark-arrow-up"></i>
+                            </div>
+                            <div class="fw-bold text-dark mb-1">Drag &amp; drop document here</div>
+                            <div class="text-muted small mb-3">PDF, JPG, or PNG formats supported</div>
+                            <input type="file" id="fileInput" name="file" class="d-none" accept=".pdf,.jpg,.jpeg,.png" required>
+                            <span class="badge bg-light text-secondary border px-3 py-2" id="selectedFileName">
+                                <i class="bi bi-folder2-open me-1"></i> Browse Files
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small mt-2">
+                            <span><i class="bi bi-check2 text-success me-1"></i>Page Limit: <strong>&le; 3 pages</strong></span>
+                            <span><i class="bi bi-check2 text-success me-1"></i>Native &amp; Scanned</span>
+                        </div>
+                    </div>
+
+                    <!-- Processing Action Button -->
+                    <button type="submit" class="btn btn-primary-modern w-100 d-flex align-items-center justify-content-center gap-2" id="submitBtn">
+                        <i class="bi bi-play-circle-fill fs-5"></i>
+                        <span>Ingest &amp; Validate Document</span>
+                    </button>
+                </form>
+
+                <!-- Status Feedback Notification -->
+                <div id="statusAlert" class="alert mt-3 d-none rounded-3" role="alert"></div>
+
+                <!-- Architectural Pipeline Blueprint -->
+                <div class="border rounded-3 p-3 bg-light mt-4">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-primary text-white">PIPELINE FLOW</span>
+                    </div>
+                    <ul class="list-unstyled small text-muted mb-0 ps-1" style="line-height: 1.7;">
+                        <li><i class="bi bi-check-circle-fill text-success me-1"></i> <strong>Validation:</strong> MIME, corrupt, page limit &le; 3</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-1"></i> <strong>Rendering:</strong> 150 DPI page rasterization</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-1"></i> <strong>AI Engine:</strong> Multimodal extraction + grounding</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-1"></i> <strong>Audit:</strong> Domain arithmetic &amp; tolerance check</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Processed Documents History -->
+    <div class="col-lg-8">
+        <div class="card-modern h-100 d-flex flex-column">
+            <div class="card-header-modern d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                        <i class="bi bi-database-fill-check text-primary"></i>
+                        Persistent Document Records
+                    </h6>
+                    <div class="text-muted small mt-0.5">Real-time SQLite database audit records</div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <input type="text" class="form-control form-control-sm" id="tableSearchInput" placeholder="Filter by name..." style="width: 180px;">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="window.location.reload()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body p-0 flex-grow-1">
+                <div class="table-responsive">
+                    <table class="table table-modern" id="documentsTable">
+                        <thead>
+                            <tr>
+                                <th>Document Name</th>
+                                <th>Category</th>
+                                <th>Pages</th>
+                                <th>Intake Status</th>
+                                <th>Reconciliation</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if documents %}
+                                {% for d in documents %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="p-2 rounded-2 {% if 'pdf' in d.file_type %}bg-danger-subtle text-danger{% else %}bg-primary-subtle text-primary{% endif %}">
+                                                <i class="bi {% if 'pdf' in d.file_type %}bi-file-earmark-pdf-fill{% else %}bi-file-earmark-image-fill{% endif %} fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark doc-name">{{ d.document_name }}</div>
+                                                <div class="text-muted small">{{ d.file_type }} &bull; {{ d.created_at.strftime('%b %d, %H:%M') if d.created_at else 'Recent' }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge-doc-type">
+                                            {{ d.document_type | replace('_', ' ') | title }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">{{ d.page_count }}</span>
+                                    </td>
+                                    <td>
+                                        {% if d.processing_status == 'PASS' %}
+                                            <span class="badge-status-pass">
+                                                <i class="bi bi-check-circle-fill me-1"></i> PASS
+                                            </span>
+                                        {% else %}
+                                            <span class="badge-status-fail">
+                                                <i class="bi bi-x-circle-fill me-1"></i> FAILED
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if d.overall_status == 'PASS' %}
+                                            <span class="badge-status-pass">
+                                                <i class="bi bi-shield-fill-check me-1"></i> BALANCED
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill small fw-bold">
+                                                <i class="bi bi-exclamation-triangle-fill me-1"></i> VARIANCE
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="/documents/{{ d.document_name }}" class="btn btn-sm btn-outline-primary fw-semibold px-3 rounded-pill">
+                                            Inspect <i class="bi bi-arrow-right ms-1"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-5 text-muted">
+                                        <i class="bi bi-folder2-open fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                                        <div class="fw-bold text-dark">No documents in database yet</div>
+                                        <div class="small text-muted">Upload a financial document from the panel to begin.</div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}

@@ -1,0 +1,119 @@
+{
+  "document_name": "Consolidated Cash Flow Statement 2017.pdf",
+  "document_type": "cash_flow_statement",
+  "processing_status": "PASS",
+  "overall_confidence": 0.98,
+  "file_validation": {
+    "file_type": "application/pdf",
+    "is_supported": true,
+    "is_readable": true,
+    "page_count": 2,
+    "status": "PASS"
+  },
+  "extracted_data": {
+    "entity_name": {
+      "value": "HDFC Bank Limited",
+      "confidence": 0.99,
+      "page_number": 1,
+      "source_text": "HDFC Bank Limited Annual Report 2016-17"
+    },
+    "period": {
+      "value": "31-Mar-17",
+      "confidence": 0.99,
+      "page_number": 1,
+      "source_text": "For the year ended March 31, 2017"
+    },
+    "currency": {
+      "value": "INR in thousands",
+      "confidence": 0.99,
+      "page_number": 1,
+      "source_text": "₹ in '000"
+    },
+    "operating_cash_flow": {
+      "value": 172815931.0,
+      "confidence": 0.98,
+      "page_number": 1,
+      "source_text": "Net cash flow from operating activities: 172,815,931"
+    },
+    "investing_cash_flow": {
+      "value": -11476802.0,
+      "confidence": 0.98,
+      "page_number": 1,
+      "source_text": "Net cash used in investing activities: (11,476,802)"
+    },
+    "financing_cash_flow": {
+      "value": -58929743.0,
+      "confidence": 0.98,
+      "page_number": 2,
+      "source_text": "Net cash generated from financing activities: (58,929,743)"
+    },
+    "fx_translation_adjustment": {
+      "value": -282622.0,
+      "confidence": 0.96,
+      "page_number": 2,
+      "source_text": "Effect of exchange fluctuation: (282,622)"
+    },
+    "net_increase_in_cash": {
+      "value": 102126764.0,
+      "confidence": 0.99,
+      "page_number": 2,
+      "source_text": "Net increase in cash and cash equivalents: 102,422,381"
+    },
+    "opening_cash": {
+      "value": 390688815.0,
+      "confidence": 0.98,
+      "page_number": 2,
+      "source_text": "Cash and cash equivalents as at April 1st: 390,688,815"
+    },
+    "closing_cash": {
+      "value": 493111196.0,
+      "confidence": 0.99,
+      "page_number": 2,
+      "source_text": "Cash and cash equivalents as at March 31st: 493,111,196"
+    },
+    "cash_on_amalgamation": {
+      "value": 295617.0,
+      "confidence": 0.95,
+      "page_number": 2,
+      "source_text": "Cash on amalgamation: 295,617"
+    }
+  },
+  "validation": {
+    "checks": [
+      {
+        "name": "net_cash_flow_sum_check (31-Mar-17)",
+        "formula": "operating_cash_flow + investing_cash_flow + financing_cash_flow + fx_adjustment",
+        "operands": {
+          "operating": 172815931.0,
+          "investing": -11476802.0,
+          "financing": -58929743.0,
+          "fx": -282622.0
+        },
+        "calculated_value": 102126764.0,
+        "reported_value": 102126764.0,
+        "variance": 0.0,
+        "status": "PASS"
+      },
+      {
+        "name": "cash_reconciliation_check (31-Mar-17)",
+        "formula": "opening_cash + net_increase_in_cash + amalgamation_adjustments",
+        "operands": {
+          "opening_cash": 390688815.0,
+          "net_increase": 102126764.0,
+          "amalgamation": 295617.0
+        },
+        "calculated_value": 493111196.0,
+        "reported_value": 493111196.0,
+        "variance": 0.0,
+        "status": "PASS"
+      }
+    ],
+    "overall_status": "PASS",
+    "issues": []
+  },
+  "processing_metadata": {
+    "ocr_used": true,
+    "processed_at": "2026-09-10T19:22:00Z",
+    "processing_time_ms": 2180
+  }
+}

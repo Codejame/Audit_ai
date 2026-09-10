@@ -1,0 +1,171 @@
+{
+  "document_name": "20251118_000612.jpg",
+  "document_type": "invoice",
+  "processing_status": "PASS",
+  "overall_confidence": 0.98,
+  "file_validation": {
+    "file_type": "image/jpeg",
+    "is_supported": true,
+    "is_readable": true,
+    "page_count": 1,
+    "status": "PASS"
+  },
+  "extracted_data": {
+    "invoice_number": {
+      "value": "SCI/25-26/3331",
+      "confidence": 0.99,
+      "page_number": 1,
+      "source_text": "Invoice No. SCI/25-26/3331"
+    },
+    "invoice_date": {
+      "value": "2025-07-16",
+      "confidence": 0.98,
+      "page_number": 1,
+      "source_text": "Dated 16-Jul-25"
+    },
+    "vendor_name": {
+      "value": "Shankar Enterprises-(2023-24)",
+      "confidence": 0.99,
+      "page_number": 1,
+      "source_text": "Shankar Enterprises-(2023-24) 12B, SHIB DEY LANE"
+    },
+    "customer_name": {
+      "value": "Laxmi Narayan Bhandar 2",
+      "confidence": 0.98,
+      "page_number": 1,
+      "source_text": "Buyer (Bill to) Laxmi Narayan Bhandar 2"
+    },
+    "currency": {
+      "value": "INR",
+      "confidence": 0.99,
+      "page_number": 1,
+      "source_text": "INR Six Thousand Eight Hundred Sixty Two Only"
+    },
+    "subtotal": {
+      "value": 5815.17,
+      "confidence": 0.98,
+      "page_number": 1,
+      "source_text": "Taxable Value: 5,815.17"
+    },
+    "tax_amount": {
+      "value": 1046.72,
+      "confidence": 0.98,
+      "page_number": 1,
+      "source_text": "CGST 523.36 + SGST 523.36 = 1,046.72"
+    },
+    "discount": {
+      "value": 0.00,
+      "confidence": 0.95,
+      "page_number": 1
+    },
+    "round_off": {
+      "value": 0.11,
+      "confidence": 0.97,
+      "page_number": 1,
+      "source_text": "Round Off 0.11"
+    },
+    "total_amount": {
+      "value": 6862.00,
+      "confidence": 0.99,
+      "page_number": 1,
+      "source_text": "Total: ₹ 6,862.00"
+    },
+    "line_items": [
+      {
+        "description": "SAFED 800GM (24PKT) 68/-",
+        "quantity": 48.0,
+        "unit_price": 52.08,
+        "amount": 2499.84
+      },
+      {
+        "description": "SAFED WHITE DP 140GM 60PCS Twin Pack",
+        "quantity": 6.0,
+        "unit_price": 0.08,
+        "amount": 0.45
+      },
+      {
+        "description": "SAFED 2 KG (12 PKT) PRINTED BUCKET+LID 230/-",
+        "quantity": 12.0,
+        "unit_price": 172.05,
+        "amount": 2064.60
+      },
+      {
+        "description": "SAFED WHITE DP 140GM 60PCS Twin Pack",
+        "quantity": 120.0,
+        "unit_price": 7.44,
+        "amount": 892.80
+      },
+      {
+        "description": "SAFED WHITE DP 140GM 60PCS Twin Pack",
+        "quantity": 8.0,
+        "unit_price": 0.08,
+        "amount": 0.60
+      },
+      {
+        "description": "SPARKLE 200 GM BATI 48PCS (9.6 KG) WITH SCRUB PAD 20/-",
+        "quantity": 24.0,
+        "unit_price": 14.87,
+        "amount": 356.88
+      }
+    ]
+  },
+  "validation": {
+    "checks": [
+      {
+        "name": "line_item_1_check",
+        "formula": "quantity * unit_price",
+        "operands": {
+          "quantity": 48.0,
+          "unit_price": 52.08
+        },
+        "calculated_value": 2499.84,
+        "reported_value": 2499.84,
+        "variance": 0.0,
+        "status": "PASS"
+      },
+      {
+        "name": "line_item_3_check",
+        "formula": "quantity * unit_price",
+        "operands": {
+          "quantity": 12.0,
+          "unit_price": 172.05
+        },
+        "calculated_value": 2064.6,
+        "reported_value": 2064.6,
+        "variance": 0.0,
+        "status": "PASS"
+      },
+      {
+        "name": "line_items_sum_check",
+        "formula": "sum(line_items.amount)",
+        "operands": {
+          "sum_line_items": 5815.17
+        },
+        "calculated_value": 5815.17,
+        "reported_value": 5815.17,
+        "variance": 0.0,
+        "status": "PASS"
+      },
+      {
+        "name": "invoice_total_check",
+        "formula": "subtotal + tax_amount - discount",
+        "operands": {
+          "subtotal": 5815.17,
+          "tax_amount": 1046.72,
+          "discount": 0.0
+        },
+        "calculated_value": 6861.89,
+        "reported_value": 6862.0,
+        "variance": 0.11,
+        "status": "PASS"
+      }
+    ],
+    "overall_status": "PASS",
+    "issues": []
+  },
+  "processing_metadata": {
+    "ocr_used": true,
+    "processed_at": "2026-09-10T19:15:00Z",
+    "processing_time_ms": 1850
+  }
+}
