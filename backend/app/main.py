@@ -59,6 +59,24 @@ if STATIC_DIR.exists():
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 # Include REST API routes
+@app.get("/api/v1", summary="API v1 Base Index", tags=["General"])
+@app.get("/api/v1/", include_in_schema=False)
+def api_v1_root():
+    """Returns base API metadata and endpoint discovery links."""
+    return {
+        "service": "SentinelAI Document Intelligence API",
+        "version": "v1",
+        "status": "online",
+        "docs_url": "/docs",
+        "health_check_url": "/api/v1/health",
+        "endpoints": {
+            "health": "GET /api/v1/health",
+            "list_documents": "GET /api/v1/documents",
+            "process_document": "POST /api/v1/documents/process",
+            "get_document_by_name": "GET /api/v1/documents/{document_name}"
+        }
+    }
+
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(documents.router, prefix="/api/v1")
 

@@ -2,7 +2,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg)](https://fastapi.tiangolo.com/)
-[![Tests](https://img.shields.io/badge/Tests-20%2F20%20Passed-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-22%2F22%20Passed-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-green.svg)]()
 
 > **AI Engineer Internship — Technical Case Study Submission**  
@@ -141,10 +141,10 @@ FINANCIAL_TOLERANCE=1.00
 
 ## 5. Deployed Application & Repository URLs
 
-* **Live Frontend Dashboard**: `https://document-intelligence-platform.onrender.com` *(Replace with deployed URL)*
-* **Live Backend Base API**: `https://document-intelligence-platform.onrender.com/api/v1`
-* **Swagger / OpenAPI Documentation**: `https://document-intelligence-platform.onrender.com/docs`
-* **Health Check Endpoint**: `https://document-intelligence-platform.onrender.com/api/v1/health`
+* **Live Frontend Dashboard**: `https://audit-ai-bsrm.onrender.com`
+* **Live Backend Base API**: `https://audit-ai-bsrm.onrender.com/api/v1`
+* **Swagger / OpenAPI Documentation**: `https://audit-ai-bsrm.onrender.com/docs`
+* **Health Check Endpoint**: `https://audit-ai-bsrm.onrender.com/api/v1/health`
 * **Public GitHub Repository**: [https://github.com/Codejame/Audit_ai](https://github.com/Codejame/Audit_ai)
 
 ---

@@ -20,6 +20,15 @@ def test_health_check_endpoint():
     assert data["status"] == "healthy"
     assert "timestamp" in data
 
+def test_api_v1_root_endpoint():
+    """Verify GET /api/v1 returns discovery metadata."""
+    response = client.get("/api/v1")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "online"
+    assert "docs_url" in data
+    assert "endpoints" in data
+
 def test_process_invalid_file_type_returns_400():
     """Verify uploading unsupported file type returns 400 with UNSUPPORTED_FILE_TYPE."""
     file_payload = ("test.txt", io.BytesIO(b"Unsupported plain text"), "text/plain")
