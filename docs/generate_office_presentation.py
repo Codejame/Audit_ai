@@ -1,11 +1,11 @@
 """
 Professional 25-Slide Office Presentation Generator for SentinelAI Platform.
 Author: Partha Protim Mondal (mondalpartha6561@gmail.com)
-Key Features:
-- Increased font sizes across all slides for readability on projectors/monitors.
-- Strictly bounded text and code boxes so zero text overflows.
-- Complete, syntactically valid code snippets with full signatures and return statements.
-- Embedded high-resolution diagrams, live dashboard screenshot, and sample scans.
+Key Updates:
+1. Removed Slide 25 bottom items matching user screenshot.
+2. Fixed Slide 7 code so `return FileValidation(...)` is at top-level function scope.
+3. All functions have explicit, visible return statements.
+4. Generates SentinelAI_Office_Presentation.pptx and solution_presentation.pptx.
 """
 import os
 from pptx import Presentation
@@ -24,7 +24,7 @@ def build_deck():
     PRIMARY = RGBColor(2, 132, 199)       # Sky 600
     NAVY = RGBColor(15, 23, 42)           # Slate 900
     DARK_BLUE = RGBColor(30, 41, 59)      # Slate 800
-    TEXT_MAIN = RGBColor(30, 41, 59)      # Slate 800 (Darker for contrast)
+    TEXT_MAIN = RGBColor(30, 41, 59)      # Slate 800
     TEXT_MUTED = RGBColor(71, 85, 105)    # Slate 600
     WHITE = RGBColor(255, 255, 255)
     ACCENT_GREEN = RGBColor(16, 185, 129) # Emerald 500
@@ -35,7 +35,6 @@ def build_deck():
     CODE_TEXT = RGBColor(241, 245, 249)   # Slate 100
 
     def add_slide_header(slide, pill_text, title_text, subtitle_text=""):
-        # Pill category badge
         pill = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(0.35), Inches(2.6), Inches(0.38))
         pill.fill.solid()
         pill.fill.fore_color.rgb = RGBColor(240, 249, 255)
@@ -51,7 +50,6 @@ def build_deck():
         pp.font.color.rgb = PRIMARY
         pp.alignment = PP_ALIGN.CENTER
 
-        # Title and Subtitle Box
         tb = slide.shapes.add_textbox(Inches(0.8), Inches(0.78), Inches(11.7), Inches(0.8))
         tf = tb.text_frame
         tf.word_wrap = True
@@ -91,10 +89,9 @@ def build_deck():
         return card
 
     def add_code_slide(slide, pill, title, subtitle, filename, code_str, explanations):
-        """Creates a side-by-side code snippet + detailed plain-English explanation slide."""
         add_slide_header(slide, pill, title, subtitle)
 
-        # Left Column: Code Box (Width: 6.8 inches, Top: 1.65, Height: 5.4)
+        # Left Column: Code Box
         left_box = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.65), Inches(6.8), Inches(5.4))
         left_box.fill.solid()
         left_box.fill.fore_color.rgb = CODE_BG
@@ -131,7 +128,7 @@ def build_deck():
             p.font.size = Pt(10.5)
             p.font.color.rgb = CODE_TEXT
 
-        # Right Column: Plain English Explanation (Width: 4.8 inches)
+        # Right Column: Plain English Explanation
         right_box = add_card(slide, 7.8, 1.65, 4.7, 5.4, title="💡 Code Walkthrough & Rationale")
         rtb = slide.shapes.add_textbox(Inches(8.05), Inches(2.2), Inches(4.25), Inches(4.75))
         rtf = rtb.text_frame
@@ -247,7 +244,7 @@ def build_deck():
     tf2_3.paragraphs[0].font.color.rgb = TEXT_MAIN
 
     # =========================================================================
-    # SLIDE 3: Documents in Scope & Industry Challenge (With Pictures)
+    # SLIDE 3: Documents in Scope (With Pictures)
     # =========================================================================
     s3 = prs.slides.add_slide(blank_layout)
     add_slide_header(s3, "SCOPE & COVERAGE", "Four Supported Financial Document Schemas", 
@@ -368,37 +365,39 @@ def build_deck():
     tf6_3.paragraphs[0].font.color.rgb = TEXT_MAIN
 
     # =========================================================================
-    # SLIDE 7: Code Deep-Dive 1 — File Validation Service
+    # SLIDE 7: Code Deep-Dive 1 — File Validation Service (Fixed Return!)
     # =========================================================================
     s7 = prs.slides.add_slide(blank_layout)
+    # Notice: Top-level return statement covering both PDF and Image formats!
     code_val = """def validate_file(self, filename: str, content: bytes) -> FileValidation:
+    # 1. Guard against empty file uploads
     if not content or len(content) == 0:
-        raise DocumentValidationError("CORRUPTED_OR_EMPTY_FILE", "Empty file.")
+        raise DocumentValidationError("CORRUPTED_OR_EMPTY_FILE", "File is empty.")
 
+    # 2. Check allowed formats (PDF, JPG, PNG)
     ext = os.path.splitext(filename)[1].lower().lstrip(".")
     if ext not in settings.ALLOWED_EXTENSIONS:
         raise DocumentValidationError("UNSUPPORTED_FILE_TYPE", "PDF/JPG/PNG only.")
 
-    if ext == "pdf":
-        doc = fitz.open(stream=content, filetype="pdf")
-        page_count = len(doc)
-        doc.close()
-        if page_count > settings.MAX_PAGE_LIMIT: # 3 pages max
-            raise DocumentValidationError("PAGE_LIMIT_EXCEEDED", f"Max 3 pages.")
+    # 3. Check page limit constraint (<= 3 pages)
+    page_count = len(fitz.open(stream=content, filetype="pdf")) if ext == "pdf" else 1
+    if page_count > settings.MAX_PAGE_LIMIT:
+        raise DocumentValidationError("PAGE_LIMIT_EXCEEDED", f"Max 3 pages allowed.")
 
-        return FileValidation(
-            file_type="application/pdf",
-            is_supported=True,
-            is_readable=True,
-            page_count=page_count,
-            status="PASS"
-        )"""
+    # 4. Explicit function-level return statement
+    return FileValidation(
+        file_type="application/pdf" if ext == "pdf" else f"image/{ext}",
+        is_supported=True,
+        is_readable=True,
+        page_count=page_count,
+        status="PASS"
+    )"""
 
     expl_val = [
         ("Empty File Guard", "Validates byte length before memory allocation. Empty 0-byte uploads fail instantly with clean error codes."),
         ("Extension Whitelist", "Restricts intake strictly to allowed formats (pdf, jpg, png), preventing arbitrary file uploads."),
-        ("In-Memory Page Limit Check", "PyMuPDF inspects stream without touching disk, validating total page count against MAX_PAGE_LIMIT <= 3."),
-        ("Clean Return Statement", "Returns a strongly-typed FileValidation schema with status='PASS' when all boundary conditions succeed.")
+        ("In-Memory Page Check", "PyMuPDF inspects stream without touching disk, checking total pages against MAX_PAGE_LIMIT (<= 3)."),
+        ("Top-Level Return Statement", "Every code path resolves to the explicit return FileValidation(...) statement at the end of the function.")
     ]
     add_code_slide(s7, "CODE DEEP-DIVE", "Input Validation Service Implementation", 
                    "Enforcing boundary constraints before engaging expensive AI and OCR models",
@@ -439,8 +438,7 @@ def build_deck():
 
         if ext == "pdf":
             doc = fitz.open(stream=file_bytes, filetype="pdf")
-            for idx in range(len(doc)):
-                page = doc[idx]
+            for page in doc:
                 chunks.append(page.get_text())
                 pix = page.get_pixmap(dpi=150) # Crisp 150 DPI
                 images.append(Image.open(io.BytesIO(pix.tobytes("png"))))
@@ -456,7 +454,7 @@ def build_deck():
         ("In-Memory PDF Ingestion", "fitz.open(stream=file_bytes) parses PDF binaries directly from RAM without touching the file system, maximizing speed and security."),
         ("Dual Stream Output", "Simultaneously extracts selectable text and generates 150 DPI RGB images, feeding both text and visual channels to models."),
         ("Dynamic OCR Tagging", "Automatically flags ocr_used=True for image uploads or scanned PDFs where native text is absent, meeting Section 5.2 metadata requirements."),
-        ("Standard Return Tuple", "Returns clean tuple: (combined_native_text, list_of_images, ocr_used_boolean).")
+        ("Explicit Return Statement", "Returns a standard 3-item tuple: (combined_native_text, list_of_images, ocr_used_boolean).")
     ]
     add_code_slide(s9, "CODE DEEP-DIVE", "Document Rasterization & OCR Service", 
                    "In-memory high-DPI rasterization and hybrid text extraction",
@@ -515,10 +513,10 @@ def build_deck():
     return data, confidence"""
 
     expl_ext = [
-        ("Native JSON Response Mode", "Configures response_mime_type='application/json' in Gemini generation config, guaranteeing syntactically valid JSON output."),
-        ("Multi-Image Vision Ingestion", "Passes the prompt and all rendered page images concurrently into Gemini Flash, providing full visual multi-page context."),
+        ("Native JSON Response Mode", "Configures response_mime_type='application/json' in Gemini generation config, guaranteeing valid JSON syntax."),
+        ("Multi-Image Ingestion", "Passes the prompt and all rendered page images concurrently into Gemini Flash, providing visual context."),
         ("Evidence & Grounding Instruction", "Explicitly directs the model to cite exact source text and page index, preventing fabricated figures."),
-        ("Definite Return Statement", "Returns a tuple containing structured extraction dictionary and overall confidence float (e.g. 0.96).")
+        ("Explicit Return Statement", "Returns the structured extraction dictionary and overall confidence float (e.g. 0.96).")
     ]
     add_code_slide(s11, "CODE DEEP-DIVE", "Multimodal Extraction Service Implementation", 
                    "Schema-constrained prompt engineering with zero-hallucination guardrails",
@@ -560,13 +558,7 @@ def build_deck():
         return 0.0
 
     # Detect accounting bracketed negative: (1,018,904,990) -> -1018904990.0
-    is_negative = False
-    bracket_match = re.match(r"^\\((.+)\\)$", raw)
-    if bracket_match:
-        is_negative = True
-        raw = bracket_match.group(1).strip()
-
-    # Strip currency signs & commas; preserve digits and decimal point
+    is_negative = bool(re.match(r"^\\((.+)\\)$", raw))
     cleaned = re.sub(r"[^\\d.]", "", raw)
     if not cleaned:
         return None
@@ -576,9 +568,9 @@ def build_deck():
 
     expl_parse = [
         ("Type Fast-Path", "Immediately casts existing ints and floats without string overhead, ensuring peak execution performance."),
-        ("Accounting Bracket Regex", "Regex ^\\((.+)\\)$ captures parentheses content, flags is_negative=True, and unwraps the inner magnitude."),
+        ("Accounting Bracket Regex", "Regex captures parentheses content, flags is_negative=True, and unwraps the inner magnitude."),
         ("Robust Character Stripping", "re.sub(r'[^\\d.]', '', raw) eliminates currency symbols, spaces, and commas, preserving only digits and dot."),
-        ("Signed Return Statement", "Applies the negative sign if is_negative is True, returning standard IEEE-754 floats ready for financial math.")
+        ("Explicit Return Statement", "Applies the negative sign if is_negative is True, returning standard IEEE-754 floats ready for math.")
     ]
     add_code_slide(s13, "CODE DEEP-DIVE", "Accounting Negative & Number Normalization", 
                    "Regex-powered parsing of accounting bracketed negatives and multi-currency values",
@@ -628,13 +620,14 @@ def build_deck():
             variance=variance,
             status="PASS" if is_pass else "FAIL"
         ))
+
     return checks"""
 
     expl_inv = [
         ("Configurable Tolerance", "Applies settings.FINANCIAL_TOLERANCE (default 1.00) to account for regional VAT rounding without falsely failing."),
         ("Precise Variance Tracking", "Computes and rounds variance = round(abs(calc - reported), 2), surfacing the exact discrepancy in the JSON response."),
         ("Structured Check Object", "Outputs standardized metadata: formula string, input dictionary, calculated vs reported values, and PASS/FAIL badge."),
-        ("Full Method Return", "Method completes cleanly with return checks, supplying the list of audit items to the caller.")
+        ("Explicit Return Statement", "Method cleanly concludes with return checks, supplying the list of audit items to the caller.")
     ]
     add_code_slide(s15, "CODE DEEP-DIVE", "Invoice Validation Implementation", 
                    "Mathematical formula validation with rounding tolerance and variance reporting",
@@ -730,13 +723,14 @@ def build_deck():
 
     # 5. Atomic SQLite Persistence & Response Formatting
     record = self.repository.create_document_record(...)
+
     return self._format_response(record)"""
 
     expl_orch = [
         ("Unified Orchestration", "Coordinates validation, OCR rendering, AI extraction, math auditing, and persistence in one deterministic pipeline."),
         ("Fail-Fast Gatekeeping", "If validation fails at step 1, execution stops immediately before invoking expensive LLM APIs."),
         ("Atomic Audit Persistence", "Stores raw extracted JSON, all validation check statuses, and OCR flags in SQLite in a single transaction."),
-        ("Clean Return Statement", "Returns the Section 5.2 compliant JSON response including file validation, extracted tables, and math checks.")
+        ("Explicit Return Statement", "Returns the Section 5.2 compliant JSON response including file validation, extracted tables, and math checks.")
     ]
     add_code_slide(s19, "CODE DEEP-DIVE", "Pipeline Orchestration Service", 
                    "End-to-end orchestration coordinating validation, OCR, LLM extraction, and persistence",
@@ -874,7 +868,7 @@ def build_deck():
         tf.paragraphs[0].font.color.rgb = TEXT_MAIN
 
     # =========================================================================
-    # SLIDE 25: Conclusion, Q&A & Live Demonstration
+    # SLIDE 25: Conclusion & Key Submission URLs (Cleaned per user request!)
     # =========================================================================
     s25 = prs.slides.add_slide(blank_layout)
     bg25 = s25.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
@@ -882,7 +876,7 @@ def build_deck():
     bg25.fill.fore_color.rgb = NAVY
     bg25.line.fill.background()
 
-    tb25 = s25.shapes.add_textbox(Inches(1.0), Inches(1.2), Inches(11.333), Inches(5.4))
+    tb25 = s25.shapes.add_textbox(Inches(1.0), Inches(1.6), Inches(11.333), Inches(4.5))
     tf25 = tb25.text_frame
     tf25.word_wrap = True
 
@@ -903,38 +897,29 @@ def build_deck():
     p_div.font.color.rgb = PRIMARY
 
     p3 = tf25.add_paragraph()
-    p3.text = "Candidate Deliverables Summary:\n"
-    p3.font.size = Pt(14)
+    p3.text = "Core Submission Deliverables:\n"
+    p3.font.size = Pt(16)
     p3.font.bold = True
     p3.font.color.rgb = RGBColor(226, 232, 240)
 
+    # Only core deliverables remain; the items from screenshot 1 have been completely removed!
     items = [
         ("Public GitHub Repository: ", "https://github.com/Codejame/Audit_ai"),
         ("Live Deployed Dashboard: ", "https://audit-ai-bsrm.onrender.com"),
-        ("Live REST API Gateway: ", "https://audit-ai-bsrm.onrender.com/api/v1"),
-        ("Interactive Swagger Docs: ", "https://audit-ai-bsrm.onrender.com/docs"),
-        ("Service Health Check: ", "https://audit-ai-bsrm.onrender.com/api/v1/health"),
-        ("Automated Test Suite: ", "22 / 22 Tests Passing (100% test coverage)"),
-        ("Presenter Details: ", "Partha Protim Mondal  |  mondalpartha6561@gmail.com")
+        ("Live REST API Gateway: ", "https://audit-ai-bsrm.onrender.com/api/v1")
     ]
     for label, val in items:
         p_item = tf25.add_paragraph()
         run_l = p_item.add_run()
         run_l.text = f"• {label} "
         run_l.font.bold = True
-        run_l.font.size = Pt(13)
+        run_l.font.size = Pt(15)
         run_l.font.color.rgb = PRIMARY
 
         run_v = p_item.add_run()
         run_v.text = val
-        run_v.font.size = Pt(13)
+        run_v.font.size = Pt(15)
         run_v.font.color.rgb = RGBColor(241, 245, 249)
-
-    p_demo = tf25.add_paragraph()
-    p_demo.text = "\nThank You! Open for Questions & Live System Demonstration."
-    p_demo.font.size = Pt(16)
-    p_demo.font.bold = True
-    p_demo.font.color.rgb = ACCENT_GREEN
 
     # Save presentation
     output_path = "docs/solution_presentation.pptx"
