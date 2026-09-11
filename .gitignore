@@ -54,3 +54,11 @@ htmlcov/
 *.swo
 .DS_Store
 Thumbs.db
+
+# Assessment Question Document
+assesment question.pdf
+*assesment*
+
+# Local Presentations (Keep local, do not push to GitHub)
+*.pptx
+docs/*.pptx
